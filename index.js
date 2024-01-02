@@ -21,5 +21,8 @@ app.use("/auth", authRoutes);
 app.use("/quiz", quizRoutes);
 app.use("/question", questionRoutes);
 app.use("/user", userRoutes);
+app.get('/',(req,res)=>{
+  res.send('Hello')
+})
 
 app.listen(process.env.Port);
