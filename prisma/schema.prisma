@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  email    String   @unique
+  username String
+  password String
+  admin    Boolean  @default(false)
+  Result   Result[]
+}
+
+model Quiz {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  Question    Question[]
+  Result      Result[]
+}
+
+model Question {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  Question    String
+  OptionOne   String
+  OptionTwo   String
+  OptionThree String
+  quizId      String @db.ObjectId
+  Quiz        Quiz   @relation(fields: [quizId], references: [id])
+
+  CorrectOption CorrectOption?
+}
+
+model CorrectOption {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  CorrectOption String
+  questionId    String   @unique @db.ObjectId
+  Question      Question @relation(fields: [questionId], references: [id])
+}
+
+model Result {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String          @db.ObjectId
+  user          User            @relation(fields: [userId], references: [id])
+  quizId        String          @db.ObjectId
+  Quiz          Quiz            @relation(fields: [quizId], references: [id])
+  ResultHistory ResultHistory[]
+  total         Int
+  mark          Int
+  createdAt     DateTime        @default(now())
+}
+
+model ResultHistory {
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  Question       String
+  CorrectOption  String
+  SelectedOption String
+  resultId       String @db.ObjectId
+  Result         Result @relation(fields: [resultId], references: [id])
+}
